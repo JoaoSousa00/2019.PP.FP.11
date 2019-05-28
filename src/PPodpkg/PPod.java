@@ -4,6 +4,15 @@ import Interfaces.PPodService;
 import Enumerations.Extension;
 import Enumerations.Reordena;
 import Exceptions.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * <h3>
@@ -20,7 +29,7 @@ import Exceptions.*;
  * </p>
  */
 
-public class PPod implements PPodService{
+public class PPod implements PPodService, Serializable{
 
     /**
      * Número máximo de ficheiros no player
@@ -260,6 +269,80 @@ public class PPod implements PPodService{
         else
             this.currentIndex--;
         this.playTrack(currentIndex);
+    }
+    
+    /**
+     * Saves files in the player to the filepath
+     * 
+     * @param filepath filepath to write the files
+     * @return If sucefull or not
+     */
+    public boolean backup(String filepath){
+        boolean done = false;
+            
+        try{
+            
+            for(int i=0; i<countFiles(); i++){
+                if( this.files[i].getExtension() == Extension.mp3 ){
+                    FileOutputStream fileOut = new FileOutputStream(filepath + "File" + i + ".txt");
+                    ObjectOutputStream out = new ObjectOutputStream(fileOut);
+                    
+                    out.writeObject(this.files[i]);
+                    out.close();
+                    fileOut.close();
+                
+                    System.out.println("Informação guardada no ficheiro " + (i+1) + ".");
+                }
+            }
+            done = true;
+            
+        } catch (IOException ex) {
+            Logger.getLogger(PPod.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("IOException");
+        }
+        
+        return done;
+    }
+    
+    /**
+     * Loads files in the filepath to the player
+     * 
+     * @param filepath filepath to read the files
+     * @return If sucefull or not
+     */
+    public boolean recover(String filepath){
+        boolean done = false, error = false;
+       
+        for(int i=0; !done && !error; i++){
+            try {
+            
+                FileInputStream fileIn = new FileInputStream(filepath + "File" + i + ".txt");
+                ObjectInputStream in = new ObjectInputStream(fileIn);
+                
+                System.out.println("\nInformação do ficheiro " + (i+1) + " lida.");
+                
+                this.addFile( (File) in.readObject() );
+                in.close();
+                fileIn.close();
+                
+            } catch (FileNotFoundException ex){
+                done = true;
+                if(i>0)
+                    System.out.println("\nAll files recovered.");
+                else
+                    System.out.println("No files to recover in the filepath.");
+            } catch (IOException e) {
+                e.printStackTrace();
+                error = true;
+                System.out.println("IOException");
+            } catch (ClassNotFoundException c) {
+                System.out.println("File class not found");
+                error = true;
+                c.printStackTrace();
+            }
+        }
+       
+       return done;
     }
     
 }

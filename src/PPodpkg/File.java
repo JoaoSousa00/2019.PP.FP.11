@@ -1,6 +1,7 @@
 package PPodpkg;
 
 import Enumerations.Extension;
+import java.io.Serializable;
 
 /**
  * <h3>
@@ -17,7 +18,7 @@ import Enumerations.Extension;
  * </p>
  */
 
-public class File {
+public class File implements Serializable{
 
     /**
      * Name of the file

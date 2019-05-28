@@ -66,6 +66,14 @@ public class Demo {
          
         CompanyPPods CPP = new CompanyPPods(MPA);
         System.out.println(CPP.getGlobalAddFileFailures());
+        
+        // Ficha 12
+        
+        MP.backup("");
+        
+        PPod MP2 = new PPod(Reordena.dura);
+        MP2.recover("");
+        MP2.listValidFiles();
     }
     
 }
